@@ -66,6 +66,30 @@ ouro verify --revision <hf-branch> --domains filesystem --only failed
 ouro reproduce ~/rsi/Toucan
 ```
 
+## Configuring the LLM (use any OpenAI-compatible API)
+Every LLM call in Ouroboros (`agent` / `onboard` / `explore` / `verify` /
+`improve` / `reproduce`) reads exactly two env vars, plus a per-command
+`--model` flag:
+
+```bash
+export OPENAI_BASE_URL=https://your-endpoint/v1    # must serve /chat/completions (OpenAI-compatible)
+export OPENAI_API_KEY=sk-...                       # never printed; passed only as the auth header
+
+ouro agent --model your-model-name                 # e.g. deepseek-v4-pro, qwen3.5-72b, gpt-4o…
+ouro verify --revision <br> --model your-model-name
+```
+
+Notes:
+- Sourcing `~/mcpmark/.mcp_env` in the Quickstart is just a convenient way to set
+  those two vars — plain `export`s work identically.
+- **Exception — `ouro rollout` / `ouro eval`**: their `--model` is handed to the
+  benchmark's own runner (mcpmark → litellm), which needs the `openai/` prefix
+  for custom endpoints: `--model openai/your-model-name`. The direct-call
+  commands above must NOT have the prefix.
+- Endpoints only supporting OpenAI's newer `/v1/responses` API are not required —
+  plain `/chat/completions` is enough (reasoning models work; JSON output is
+  salvage-parsed against truncation).
+
 ## The non-negotiables (RSI failure modes)
 1. Reward reliability > everything — the objective checker is the authority;
    the LLM judge only explains it (a transcript-only judge WILL rubber-stamp a
