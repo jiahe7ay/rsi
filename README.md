@@ -20,6 +20,7 @@ baseline before any training happens.
 ## Components (actual state)
 | Module | Role |
 |---|---|
+| `agent.py`       | **top-level entry — `ouro agent`**: you state a goal in plain language (an input prompt opens); the agent reads a live `ouro --help` snapshot and composes the commands below (plus shell) itself. It asks YOU in the terminal whenever it needs clarification, a decision, or a credential (secrets via hidden input, injected into child env only — never into the LLM context). **Never-quit contract**: while the goal is unmet it may not exit — every `--max-turns` steps it checkpoints (progress report + continue/steer/stop), and wanting to give up bounces back to you as a question |
 | `onboard/`       | input a repo → LLM **explores** it (ReAct, read-only, no hardcoded adapter), classifies `kind` (benchmark / data-pipeline / dataset / agent / library) and **routes**: benchmark → probe + task inventory + agent smoke; data repo → data adapter (locate produced dataset, sample it, map to Trajectory schema, honestly flag whether it has a verifiable reward); pipeline → `reproduce` |
 | `onboard/reproduce.py` | reproduce a data pipeline: agent assesses what's missing (deps / credentials / config, minimal vs full) → **interactive terminal elicit** (secrets via hidden input, never persisted) → run the minimal generation → deterministic new-files check |
 | `splits.py`      | ① freeze train / held-out task splits (md5-deterministic, refuses overwrite; manifests in `configs/splits/`) |
@@ -28,7 +29,7 @@ baseline before any training happens.
 | `schema.py` / `store.py` | ④ trajectory contracts + store: every trajectory carries reward + provenance |
 | `evalharness.py` | ⑤ pass@k / per-domain report on the held-out split (never sees prompt patches) |
 | `improve/`       | ⑥ prompt-level self-improvement: pull an old model's HF trajectories → analyze failure modes → generate a prompt **patch** → human approval gate (threat scan + merged-prompt diff + `[a]pprove/[e]dit/[r]eject`) → `rollout --patch` |
-| `cli.py`         | `ouro onboard \| explore \| split \| rollout \| eval \| baseline \| improve \| verify \| reproduce` |
+| `cli.py`         | `ouro agent \| onboard \| explore \| split \| rollout \| eval \| baseline \| improve \| verify \| reproduce` |
 
 ## Reuse vs build
 - **Reuse:** mcpmark checker + env (reward authority), hermes-agent ideas (facts scratchpad, verify-on-stop), sglang serving, Megatron-SWIFT (later)
@@ -41,6 +42,14 @@ conda activate mcpmark
 pip install -e .
 set -a; . ~/mcpmark/.mcp_env; set +a         # OPENAI_BASE_URL / OPENAI_API_KEY
 
+# ── the goal-driven way: describe what you want, the agent does the rest ──
+ouro agent                                    # opens 你想做什么> ; type e.g.
+                                              #   "跑通 Toucan 问题生成+质检,然后生成轨迹"
+                                              # it plans, runs commands, and prompts YOU
+                                              # for keys/decisions; checkpoints every 40 turns
+ouro agent --goal "..." --max-turns 40        # non-interactive goal, same loop
+
+# ── or drive each stage yourself ──
 ouro onboard ~/mcpmark                        # LLM explores + classifies + smokes
 ouro split                                    # freeze splits (runnable domains only)
 ouro rollout --split train --domains filesystem --suite easy -n 1
