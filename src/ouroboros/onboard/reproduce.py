@@ -92,9 +92,15 @@ def assess_reproduce(spec, model: str, base_url: str, key: str) -> dict:
             f"=== 当前环境依赖可用性 ===\n{json.dumps(have, ensure_ascii=False)}\n\n"
             f"=== 已知 env 键(explore 得到)===\n{json.dumps(envkeys, ensure_ascii=False)}\n\n"
             f"=== notes ===\n{spec.notes}")
-    out = _llm([{"role": "system", "content": _SYS}, {"role": "user", "content": user}],
-               base_url, key, model, max_tokens=1900)
-    res = _json_obj(out)
+    # reasoning models emit parseable JSON only intermittently — retry until the
+    # plan carries a run_command (observed: one run returned no usable plan at all)
+    res = {}
+    for _ in range(3):
+        out = _llm([{"role": "system", "content": _SYS}, {"role": "user", "content": user}],
+                   base_url, key, model, max_tokens=1900)
+        res = _json_obj(out)
+        if res.get("run_command"):
+            break
     res["_dep_have"] = have          # attach the deterministic probe for the caller
     return res
 
@@ -196,6 +202,47 @@ def elicit_interactive(missing: list[dict], launcher: str, auto: bool = False) -
     return env_extra, unresolved
 
 
+def _static_import_gaps(repo: Path, entry: str, workdir: str, launcher: str) -> list[str]:
+    """Deterministic backstop: top-level imports of the entry script that fail to
+    import here and aren't local modules. The assess LLM MISSES deps between runs
+    (observed: torch listed once, dropped the next) — this doesn't gamble."""
+    p = repo / entry
+    if not p.is_file():
+        return []
+    mods = set()
+    for m in re.finditer(r'^\s*(?:import|from)\s+([A-Za-z_][A-Za-z0-9_]*)',
+                         p.read_text(errors="ignore"), re.M):
+        mods.add(m.group(1))
+    gaps = []
+    wd = repo / workdir
+    for mod in sorted(mods):
+        if (wd / f"{mod}.py").exists() or (wd / mod).is_dir():   # local module
+            continue
+        if not _probe_import(mod, launcher):
+            gaps.append(mod)
+    return gaps
+
+
+_SYS_FIX = (
+    "你是运行修复专家。一条数据管线命令运行失败了,给你命令、工作目录、报错尾部。"
+    "判断失败能否通过【补依赖 / 补凭证 / 修改命令】解决。"
+    "只输出一个 JSON:{\"diagnosis\":\"一句话原因\","
+    "\"needs\":[{\"key\":\"如 torch 或 OPENAI_API_KEY\",\"kind\":\"dependency|credential|endpoint|config\","
+    "\"purpose\":\"干嘛\",\"secret\":true/false,\"needed_for\":\"minimal\",\"have\":false}],"
+    "\"fixed_command\":\"若只需改命令给出新命令,否则留空\",\"fixable\":true/false}")
+
+
+def diagnose_failure(cmd: str, workdir: str, err_tail: str,
+                     model: str, base_url: str, key: str) -> dict:
+    user = f"命令: {cmd}\n工作目录: {workdir}\n报错尾部:\n{err_tail[-1500:]}"
+    try:
+        out = _llm([{"role": "system", "content": _SYS_FIX},
+                    {"role": "user", "content": user}], base_url, key, model, max_tokens=900)
+    except Exception:
+        return {}
+    return _json_obj(out)
+
+
 def _new_files(repo: Path, since: float, limit: int = 20) -> list[Path]:
     out = []
     for p in repo.rglob("*"):
@@ -225,6 +272,19 @@ def run_reproduce(spec, model: str, base_url: str, key: str, launcher: str = "",
     workdir = str(res.get("workdir") or Path(spec.entrypoint).parent or ".")
     print(f"  工作目录: {workdir}")
     needs = res.get("needs", []) or []
+    # deterministic backstop — don't gamble on the LLM listing every import.
+    # Scan the script the run_command ACTUALLY invokes (spec.entrypoint is
+    # LLM-filled and has been observed to carry a non-path like "README.MD (说明)").
+    m = re.search(r'([A-Za-z0-9_./\-]+\.py)\b', res.get("run_command", "") or "")
+    entry_script = m.group(1) if m else spec.entrypoint
+    if entry_script and "/" not in entry_script and workdir not in ("", "."):
+        entry_script = f"{workdir}/{entry_script}"
+    known = {str(n.get("key", "")).strip() for n in needs}
+    for g in _static_import_gaps(repo, entry_script, workdir, launcher):
+        if g not in known:
+            needs.append({"key": g, "kind": "dependency", "needed_for": "minimal",
+                          "have": False, "secret": False,
+                          "purpose": "入口脚本顶层 import(静态兜底检出,LLM 评估漏了它)"})
     for n in needs:
         mark = "✅" if n.get("have") else "❌"
         print(f"  {mark} [{str(n.get('kind','')):10}] {str(n.get('key',''))[:42]:42} ({n.get('needed_for')})")
@@ -237,22 +297,46 @@ def run_reproduce(spec, model: str, base_url: str, key: str, launcher: str = "",
             print(f"\n⏸ 仍缺 {len(unresolved)} 项 minimal 必需: {', '.join(unresolved)} — 补齐后重跑。")
             return {"ok": False, "stage": "elicit", "unresolved": unresolved}
 
-    print("\n  ▶ 实跑最小生成 ...")
-    exports = "".join(f"export {k}={shlex.quote(v)}; " for k, v in env_extra.items())
+    # run → on failure, diagnose the REAL error → elicit the fix → retry.
+    # The error message beats any upfront assessment (same lesson as solve_smoke).
+    run_cmd, attempt, max_repair = res["run_command"], 0, 2
     pre = f"{launcher} && " if launcher else ""
-    cmd = f"{pre}cd {shlex.quote(str(repo / workdir))} && {exports}{res['run_command']}"
-    t0 = time.time()
-    try:
-        rc, out = _sh(cmd, run_timeout)
-    except subprocess.TimeoutExpired:
-        print(f"  ✗ 超时({run_timeout}s)。")
-        return {"ok": False, "stage": "run", "reason": "timeout"}
-    tail = "\n".join(out.strip().splitlines()[-12:])
-    print("  --- 输出尾部 ---")
-    print("  " + tail.replace("\n", "\n  ")[:1800])
+    while True:
+        print(f"\n  ▶ 实跑最小生成{f'(修复后第 {attempt} 次重试)' if attempt else ''} ...")
+        exports = "".join(f"export {k}={shlex.quote(v)}; " for k, v in env_extra.items())
+        cmd = f"{pre}cd {shlex.quote(str(repo / workdir))} && {exports}{run_cmd}"
+        t0 = time.time()
+        try:
+            rc, out = _sh(cmd, run_timeout)
+        except subprocess.TimeoutExpired:
+            print(f"  ✗ 超时({run_timeout}s)。")
+            return {"ok": False, "stage": "run", "reason": "timeout"}
+        tail = "\n".join(out.strip().splitlines()[-12:])
+        print("  --- 输出尾部 ---")
+        print("  " + tail.replace("\n", "\n  ")[:1800])
+        produced = _new_files(repo, t0)
+        ok = rc == 0 and bool(produced)
+        if ok or attempt >= max_repair:
+            break
 
-    produced = _new_files(repo, t0)
-    ok = rc == 0 and bool(produced)
+        attempt += 1
+        print(f"\n  ✗ 失败 → 让 agent 诊断报错(自愈 {attempt}/{max_repair}) ...")
+        diag = diagnose_failure(run_cmd, workdir, out, model, base_url, key)
+        if not diag or not diag.get("fixable"):
+            print(f"  诊断: {diag.get('diagnosis', '(无法诊断)') if diag else '(无法诊断)'} — 不可自动修复,停。")
+            break
+        print(f"  诊断: {diag.get('diagnosis','')}")
+        fix_needs = [n for n in (diag.get("needs") or []) if n.get("key")]
+        if fix_needs:
+            more_env, unresolved = elicit_interactive(fix_needs, launcher, auto=auto)
+            if unresolved:
+                print(f"\n⏸ 修复项未补齐: {', '.join(unresolved)} — 停。")
+                return {"ok": False, "stage": "repair-elicit", "unresolved": unresolved}
+            env_extra.update(more_env)
+        if diag.get("fixed_command"):
+            run_cmd = str(diag["fixed_command"]).strip()
+            print(f"  改用命令: {run_cmd[:160]}")
+
     if produced:
         print("\n  产出的新文件:")
         for p in produced[:8]:
@@ -265,5 +349,5 @@ def run_reproduce(spec, model: str, base_url: str, key: str, launcher: str = "",
                     pass
             print(f"    + {rel}{note}")
     print(f"\n{'✅ 复现成功:管线真实产出了数据' if ok else '✗ 复现未成功(exit=' + str(rc) + (',无新产出文件' if not produced else '') + ')'}")
-    return {"ok": ok, "stage": "run", "exit": rc,
+    return {"ok": ok, "stage": "run", "exit": rc, "repairs": attempt,
             "produced": [str(p.relative_to(repo)) for p in produced]}

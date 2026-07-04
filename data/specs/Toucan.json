@@ -3,33 +3,12 @@
   "repo_path": "/home/ubuntu/rsi/Toucan",
   "adapter": "llm-explored",
   "kind": "data-pipeline",
-  "entrypoint": "datagen/step1.1_gen_questions.py",
-  "env_file": "datagen/model_configs.json",
+  "entrypoint": "datagen/README.MD (多步骤数据合成管线)",
+  "env_file": "datagen/smithery_api_pool.json",
   "required_env": [
     {
-      "key": "SMITHERY_API_KEY",
-      "purpose": "Access MCP servers via Smithery API for tool execution",
-      "example": "",
-      "secret": true,
-      "required": true
-    },
-    {
-      "key": "OPENAI_API_KEY",
-      "purpose": "LLM API for question generation and quality checks",
-      "example": "",
-      "secret": true,
-      "required": true
-    },
-    {
-      "key": "TOGETHER_API_KEY",
-      "purpose": "Alternative LLM API provider",
-      "example": "",
-      "secret": true,
-      "required": true
-    },
-    {
-      "key": "OPENROUTER_API_KEY",
-      "purpose": "Alternative LLM API provider",
+      "key": "SMITHERY_API_KEYS",
+      "purpose": "Smithery API 密钥，存放于 smithery_api_pool.json 中，用于 MCP 服务器连接",
       "example": "",
       "secret": true,
       "required": true
@@ -37,15 +16,15 @@
   ],
   "deps": [],
   "notes": [
-    "Requires multiple Smithery API keys in datagen/smithery_api_pool.json",
-    "Multi-step pipeline: step1.* question synthesis, step2.* quality check, step3.* trajectory generation, step4.* response quality check",
-    "Datagen scripts use config from datagen/model_configs.json",
-    "run_hint: python datagen/step1.1_gen_questions.py --total_prompts 1000 --sampling_strategy random"
+    "完整流程需依次执行 Step1-4 多个脚本",
+    "Smithery API 密钥需提前配置在 smithery_api_pool.json",
+    "最终数据集可上传 HF 或用于微调",
+    "run_hint: python datagen/step1.1_gen_questions.py --total_prompts 10 --sampling_strategy random"
   ],
   "domains": [],
   "data_source": {
     "hf_repo": "Agent-Ark/Toucan-1.5M",
-    "local_glob": "datagen/*.jsonl",
+    "local_glob": "*.jsonl (管线各步骤生成的中间/最终 JSONL 文件)",
     "format": "jsonl"
   }
 }
