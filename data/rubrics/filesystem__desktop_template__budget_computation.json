@@ -1,0 +1,27 @@
+{
+  "task_name": "desktop_template__budget_computation",
+  "domain": "filesystem",
+  "criteria": [
+    {
+      "id": "c1",
+      "criterion": "文件 total_budget.txt 存在于指定的主目录中",
+      "weight": 0.2,
+      "critical": true
+    },
+    {
+      "id": "c2",
+      "criterion": "文件中每一行（除最后一行外）严格符合格式：相对路径;价格，价格保留两位小数，无额外文本",
+      "weight": 0.2,
+      "critical": false
+    },
+    {
+      "id": "c3",
+      "criterion": "最后一行是总和的数字，保留两位小数，且该值等于前面所有价格之和的四舍五入结果（允许浮点舍入误差）",
+      "weight": 0.2,
+      "critical": true
+    }
+  ],
+  "notes": "",
+  "generated_by": "deepseek-v4-pro",
+  "task_excerpt": "Please use FileSystem tools to finish the following task:\n\n### Task Description\n\nYou need to analyze all the files in the desktop environment to calculate personal life expenses and create a budget summary.\n\n### Task Objectives\n\n1. **Locate and analyze all files** in the desktop environment\n2. **Extract personal life expenses** from the files (such as salary, food, living material, tax, expenses on the internet, ...) (exclude expenses in project/work)\n3. **Create a file named `total_budget.txt`** in the main directory\n4. **Format each expense entry** as `file_path;price` (one per line)\n5. **Ad"
+}

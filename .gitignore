@@ -1,0 +1,18 @@
+__pycache__/
+*.pyc
+.venv/
+*.egg-info/
+build/
+dist/
+
+# bulky / regeneratable outputs. Curated artifacts ARE versioned:
+# configs/splits (frozen manifests), data/patches (approved), data/rubrics,
+# data/specs, data/datasources, data/benchmarks (inventory).
+data/rollouts/
+data/eval/
+runs/
+*.log
+.env
+
+# root-level scratch scripts (convention: _*.py at repo root)
+/_*.py

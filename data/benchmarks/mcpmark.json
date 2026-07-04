@@ -1,0 +1,341 @@
+{
+  "benchmark": "mcpmark",
+  "repo": "/home/ubuntu/mcpmark",
+  "env_file": ".mcp_env",
+  "generated_at": "2026-07-02T05:54:36",
+  "domains": [
+    {
+      "name": "filesystem",
+      "tasks_dir": "tasks/filesystem",
+      "suites": {
+        "easy": 10,
+        "standard": 30
+      },
+      "tasks": {
+        "easy": [
+          "file_context/file_splitting",
+          "file_context/pattern_matching",
+          "file_context/uppercase",
+          "file_property/largest_rename",
+          "file_property/txt_merging",
+          "folder_structure/structure_analysis",
+          "legal_document/file_reorganize",
+          "papers/papers_counting",
+          "student_database/duplicate_name",
+          "student_database/recommender_name"
+        ],
+        "standard": [
+          "desktop/music_report",
+          "desktop/project_management",
+          "desktop/timeline_extraction",
+          "desktop_template/budget_computation",
+          "desktop_template/contact_information",
+          "desktop_template/file_arrangement",
+          "file_context/duplicates_searching",
+          "file_context/file_merging",
+          "file_context/file_splitting",
+          "file_context/pattern_matching",
+          "file_context/uppercase",
+          "file_property/size_classification",
+          "file_property/time_classification",
+          "folder_structure/structure_analysis",
+          "folder_structure/structure_mirror",
+          "legal_document/dispute_review",
+          "legal_document/individual_comments",
+          "legal_document/solution_tracing",
+          "papers/author_folders",
+          "papers/find_math_paper",
+          "papers/organize_legacy_papers",
+          "student_database/duplicate_name",
+          "student_database/english_talent",
+          "student_database/gradebased_score",
+          "threestudio/code_locating",
+          "threestudio/output_analysis",
+          "threestudio/requirements_completion",
+          "votenet/dataset_comparison",
+          "votenet/debugging",
+          "votenet/requirements_writing"
+        ]
+      },
+      "required_env": [],
+      "missing_env": [],
+      "runnable": true
+    },
+    {
+      "name": "notion",
+      "tasks_dir": "tasks/notion",
+      "suites": {
+        "easy": 10,
+        "standard": 28
+      },
+      "tasks": {
+        "easy": [
+          "computer_science_student_dashboard/simple__code_snippets_go",
+          "computer_science_student_dashboard/simple__study_session_tracker",
+          "it_trouble_shooting_hub/simple__asset_retirement_migration",
+          "japan_travel_planner/simple__remove_osaka_itinerary",
+          "online_resume/simple__skills_development_tracker",
+          "python_roadmap/simple__expert_level_lessons",
+          "self_assessment/simple__faq_column_layout",
+          "standard_operating_procedure/simple__section_organization",
+          "team_projects/simple__swap_tasks",
+          "toronto_guide/simple__change_color"
+        ],
+        "standard": [
+          "company_in_a_box/employee_onboarding",
+          "company_in_a_box/goals_restructure",
+          "company_in_a_box/quarterly_review_dashboard",
+          "computer_science_student_dashboard/code_snippets_go",
+          "computer_science_student_dashboard/courses_internships_relation",
+          "computer_science_student_dashboard/study_session_tracker",
+          "it_trouble_shooting_hub/asset_retirement_migration",
+          "it_trouble_shooting_hub/security_audit_ticket",
+          "it_trouble_shooting_hub/verification_expired_update",
+          "japan_travel_planner/daily_itinerary_overview",
+          "japan_travel_planner/packing_progress_summary",
+          "japan_travel_planner/remove_osaka_itinerary",
+          "japan_travel_planner/restaurant_expenses_sync",
+          "online_resume/layout_adjustment",
+          "online_resume/projects_section_update",
+          "online_resume/skills_development_tracker",
+          "online_resume/work_history_addition",
+          "python_roadmap/expert_level_lessons",
+          "python_roadmap/learning_metrics_dashboard",
+          "self_assessment/faq_column_layout",
+          "self_assessment/hyperfocus_analysis_report",
+          "self_assessment/numbered_list_emojis",
+          "standard_operating_procedure/deployment_process_sop",
+          "standard_operating_procedure/section_organization",
+          "team_projects/priority_tasks_table",
+          "team_projects/swap_tasks",
+          "toronto_guide/change_color",
+          "toronto_guide/weekend_adventure_planner"
+        ]
+      },
+      "required_env": [
+        "SOURCE_NOTION_API_KEY",
+        "EVAL_NOTION_API_KEY",
+        "EVAL_PARENT_PAGE_TITLE"
+      ],
+      "missing_env": [
+        "SOURCE_NOTION_API_KEY",
+        "EVAL_NOTION_API_KEY",
+        "EVAL_PARENT_PAGE_TITLE"
+      ],
+      "runnable": false
+    },
+    {
+      "name": "github",
+      "tasks_dir": "tasks/github",
+      "suites": {
+        "easy": 10,
+        "standard": 23
+      },
+      "tasks": {
+        "easy": [
+          "build-your-own-x/close_commented_issues",
+          "build-your-own-x/record_recent_commits",
+          "claude-code/add_terminal_shortcuts_doc",
+          "claude-code/thank_docker_pr_author",
+          "claude-code/triage_missing_tool_result_issue",
+          "mcpmark-cicd/basic_ci_checks",
+          "mcpmark-cicd/issue_lint_guard",
+          "mcpmark-cicd/nightly_health_check",
+          "missing-semester/count_translations",
+          "missing-semester/find_ga_tracking_id"
+        ],
+        "standard": [
+          "build_your_own_x/find_commit_date",
+          "build_your_own_x/find_rag_commit",
+          "claude-code/automated_changelog_generation",
+          "claude-code/claude_collaboration_analysis",
+          "claude-code/critical_issue_hotfix_workflow",
+          "claude-code/feature_commit_tracking",
+          "claude-code/label_color_standardization",
+          "easyr1/advanced_branch_strategy",
+          "easyr1/config_parameter_audit",
+          "easyr1/performance_regression_investigation",
+          "easyr1/qwen3_issue_management",
+          "harmony/fix_conflict",
+          "harmony/issue_pr_commit_workflow",
+          "harmony/issue_tagging_pr_closure",
+          "harmony/multi_branch_commit_aggregation",
+          "harmony/release_management_workflow",
+          "mcpmark-cicd/deployment_status_workflow",
+          "mcpmark-cicd/issue_management_workflow",
+          "mcpmark-cicd/linting_ci_workflow",
+          "mcpmark-cicd/pr_automation_workflow",
+          "missing-semester/assign_contributor_labels",
+          "missing-semester/find_legacy_name",
+          "missing-semester/find_salient_file"
+        ]
+      },
+      "required_env": [
+        "GITHUB_TOKENS",
+        "GITHUB_EVAL_ORG"
+      ],
+      "missing_env": [
+        "GITHUB_TOKENS",
+        "GITHUB_EVAL_ORG"
+      ],
+      "runnable": false
+    },
+    {
+      "name": "postgres",
+      "tasks_dir": "tasks/postgres",
+      "suites": {
+        "easy": 10,
+        "standard": 21
+      },
+      "tasks": {
+        "easy": [
+          "chinook/customer_data_migration_basic",
+          "chinook/update_employee_info",
+          "dvdrental/create_payment_index",
+          "employees/department_summary_view",
+          "employees/employee_gender_statistics",
+          "employees/employee_projects_basic",
+          "employees/hiring_year_summary",
+          "lego/basic_security_setup",
+          "lego/fix_data_inconsistencies",
+          "sports/create_performance_indexes"
+        ],
+        "standard": [
+          "chinook/customer_data_migration",
+          "chinook/employee_hierarchy_management",
+          "chinook/sales_and_music_charts",
+          "dvdrental/customer_analysis_fix",
+          "dvdrental/customer_analytics_optimization",
+          "dvdrental/film_inventory_management",
+          "employees/employee_demographics_report",
+          "employees/employee_performance_analysis",
+          "employees/employee_project_tracking",
+          "employees/employee_retention_analysis",
+          "employees/executive_dashboard_automation",
+          "employees/management_structure_analysis",
+          "lego/consistency_enforcement",
+          "lego/database_security_policies",
+          "lego/transactional_inventory_transfer",
+          "security/rls_business_access",
+          "security/user_permission_audit",
+          "sports/baseball_player_analysis",
+          "sports/participant_report_optimization",
+          "sports/team_roster_management",
+          "vectors/dba_vector_analysis"
+        ]
+      },
+      "required_env": [
+        "POSTGRES_HOST",
+        "POSTGRES_PORT",
+        "POSTGRES_USERNAME",
+        "POSTGRES_PASSWORD"
+      ],
+      "missing_env": [],
+      "runnable": true
+    },
+    {
+      "name": "playwright",
+      "tasks_dir": "tasks/playwright",
+      "suites": {
+        "standard": 4
+      },
+      "tasks": {
+        "standard": [
+          "eval_web/cloudflare_turnstile_challenge",
+          "eval_web/extraction_table",
+          "web_search/birth_of_arvinxu",
+          "web_search/r1_arxiv"
+        ]
+      },
+      "required_env": [
+        "PLAYWRIGHT_BROWSER",
+        "PLAYWRIGHT_HEADLESS"
+      ],
+      "missing_env": [
+        "PLAYWRIGHT_BROWSER",
+        "PLAYWRIGHT_HEADLESS"
+      ],
+      "runnable": false
+    },
+    {
+      "name": "playwright_webarena",
+      "tasks_dir": "tasks/playwright_webarena",
+      "suites": {
+        "easy": 10,
+        "standard": 21
+      },
+      "tasks": {
+        "easy": [
+          "reddit/ai_data_analyst",
+          "reddit/llm_research_summary",
+          "reddit/movie_reviewer_analysis",
+          "reddit/nba_statistics_analysis",
+          "reddit/routine_tracker_forum",
+          "shopping_admin/fitness_promotion_strategy",
+          "shopping_admin/ny_expansion_analysis",
+          "shopping_admin/products_sales_analysis",
+          "shopping_admin/sales_inventory_analysis",
+          "shopping_admin/search_filtering_operations"
+        ],
+        "standard": [
+          "reddit/ai_data_analyst",
+          "reddit/budget_europe_travel",
+          "reddit/buyitforlife_research",
+          "reddit/llm_research_summary",
+          "reddit/movie_reviewer_analysis",
+          "reddit/nba_statistics_analysis",
+          "reddit/routine_tracker_forum",
+          "shopping/advanced_product_analysis",
+          "shopping/gaming_accessories_analysis",
+          "shopping/health_routine_optimization",
+          "shopping/holiday_baking_competition",
+          "shopping/multi_category_budget_analysis",
+          "shopping/printer_keyboard_search",
+          "shopping/running_shoes_purchase",
+          "shopping_admin/customer_segmentation_setup",
+          "shopping_admin/fitness_promotion_strategy",
+          "shopping_admin/marketing_customer_analysis",
+          "shopping_admin/ny_expansion_analysis",
+          "shopping_admin/products_sales_analysis",
+          "shopping_admin/sales_inventory_analysis",
+          "shopping_admin/search_filtering_operations"
+        ]
+      },
+      "required_env": [
+        "PLAYWRIGHT_BROWSER",
+        "PLAYWRIGHT_HEADLESS"
+      ],
+      "missing_env": [
+        "PLAYWRIGHT_BROWSER",
+        "PLAYWRIGHT_HEADLESS"
+      ],
+      "runnable": false
+    },
+    {
+      "name": "insforge",
+      "tasks_dir": "tasks/insforge",
+      "suites": {},
+      "tasks": {},
+      "required_env": [],
+      "missing_env": [],
+      "runnable": false,
+      "alias_of": "postgres"
+    },
+    {
+      "name": "supabase",
+      "tasks_dir": "tasks/supabase",
+      "suites": {},
+      "tasks": {},
+      "required_env": [
+        "SUPABASE_URL",
+        "SUPABASE_KEY"
+      ],
+      "missing_env": [
+        "SUPABASE_URL",
+        "SUPABASE_KEY"
+      ],
+      "runnable": false,
+      "alias_of": "postgres"
+    }
+  ]
+}

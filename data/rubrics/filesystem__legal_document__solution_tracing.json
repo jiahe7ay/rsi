@@ -1,0 +1,33 @@
+{
+  "task_name": "legal_document__solution_tracing",
+  "domain": "filesystem",
+  "criteria": [
+    {
+      "id": "c1",
+      "criterion": "Output file named exactly 'tracing.csv' in the main directory (the root of the filesystem).",
+      "weight": 0.9,
+      "critical": true
+    },
+    {
+      "id": "c2",
+      "criterion": "CSV has exactly 3 rows and 5 columns (including header row and label column), with no extra empty rows or columns.",
+      "weight": 0.8,
+      "critical": true
+    },
+    {
+      "id": "c3",
+      "criterion": "Header row (row 1), columns 2 through 5, contain exactly '4.6', '4.16', '6.8', '6.16' in that order.",
+      "weight": 0.9,
+      "critical": true
+    },
+    {
+      "id": "c4",
+      "criterion": "First column, rows 2 and 3, contain exactly 'version_number' and 'name' respectively (case-sensitive, no extra spaces).",
+      "weight": 0.9,
+      "critical": true
+    }
+  ],
+  "notes": "",
+  "generated_by": "deepseek-v4-pro",
+  "task_excerpt": "Please use FileSystem tools to finish the following task:\n\n### Overview\n\nThe folder \"legal_files/\" contains all versions (Preferred_Stock_Purchase_Agreement_v0.txt  -- Preferred_Stock_Purchase_Agreement_v10.txt) of the Stock Purchase Agreement for a corporate investment project.\n\nThere are comments in it, come from four people:\n\n- **Bill Harvey** (Company CEO)\n- **Michelle Jackson** (Investor)\n- **David Russel** (Company Counsel)\n- **Tony Taylor** (Investor Counsel)\n\nBetween v1 and v9, these four people make comments on the clauses. The comment format is `[name:content]`, where:\n\n- `name` is t"
+}

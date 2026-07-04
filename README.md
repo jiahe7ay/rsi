@@ -1,0 +1,78 @@
+# Ouroboros 🐍
+
+Recursive Self-Improvement (RSI) for agentic models. Ouroboros closes the loop:
+an agent generates trajectories on verifiable tasks → an objective verifier scores
+them → good trajectories train the next model → the stronger model generates better
+trajectories. The snake eats its own tail.
+
+**v1 scope: the rollout + eval foundation** (generate → verify → eval), plus the
+agent-autonomous tooling around it (onboard / auto-verify / prompt-improve /
+reproduce). The training loop (SFT/RL self-bootstrap) comes only after the
+foundation is rock-solid.
+
+## Why "foundation first"
+The easiest way to fool yourself in RSI is a dirty reward or a polluted eval.
+Ouroboros v1 nails down the things every future generation reuses — deterministic
+frozen splits, a driven-and-harvested rollout, a reward whose authority is an
+objective checker, and a strictly held-out eval — then measures a trustworthy
+baseline before any training happens.
+
+## Components (actual state)
+| Module | Role |
+|---|---|
+| `onboard/`       | input a repo → LLM **explores** it (ReAct, read-only, no hardcoded adapter), classifies `kind` (benchmark / data-pipeline / dataset / agent / library) and **routes**: benchmark → probe + task inventory + agent smoke; data repo → data adapter (locate produced dataset, sample it, map to Trajectory schema, honestly flag whether it has a verifiable reward); pipeline → `reproduce` |
+| `onboard/reproduce.py` | reproduce a data pipeline: agent assesses what's missing (deps / credentials / config, minimal vs full) → **interactive terminal elicit** (secrets via hidden input, never persisted) → run the minimal generation → deterministic new-files check |
+| `splits.py`      | ① freeze train / held-out task splits (md5-deterministic, refuses overwrite; manifests in `configs/splits/`) |
+| `rollout.py`     | ② drive the benchmark pipeline directly, harvest verified trajectories (auto-provisions postgres; `--patch` layers a prompt patch at runtime — **never** edits the benchmark's own prompts) |
+| `verify/`        | ③ LLM auto-verify: per-task rubric (cached, human-reviewable) + a judge that **explains ground truth, never overrides it** — `failure_locus` (semantic/numeric/omission/…) + disagreement flag turn silent verifier failures into analyzable signal |
+| `schema.py` / `store.py` | ④ trajectory contracts + store: every trajectory carries reward + provenance |
+| `evalharness.py` | ⑤ pass@k / per-domain report on the held-out split (never sees prompt patches) |
+| `improve/`       | ⑥ prompt-level self-improvement: pull an old model's HF trajectories → analyze failure modes → generate a prompt **patch** → human approval gate (threat scan + merged-prompt diff + `[a]pprove/[e]dit/[r]eject`) → `rollout --patch` |
+| `cli.py`         | `ouro onboard \| explore \| split \| rollout \| eval \| baseline \| improve \| verify \| reproduce` |
+
+## Reuse vs build
+- **Reuse:** mcpmark checker + env (reward authority), hermes-agent ideas (facts scratchpad, verify-on-stop), sglang serving, Megatron-SWIFT (later)
+- **Build:** everything in the table above
+
+## Quickstart (real commands)
+```bash
+# env: any python env with mcpmark's deps (we use the `mcpmark` conda env)
+conda activate mcpmark
+pip install -e .
+set -a; . ~/mcpmark/.mcp_env; set +a         # OPENAI_BASE_URL / OPENAI_API_KEY
+
+ouro onboard ~/mcpmark                        # LLM explores + classifies + smokes
+ouro split                                    # freeze splits (runnable domains only)
+ouro rollout --split train --domains filesystem --suite easy -n 1
+ouro eval --domains filesystem --k 1
+
+# learn from an old model's failures → patch → regenerate
+ouro improve --revision <hf-branch> --domains filesystem --name my-patch
+ouro rollout --patch my-patch --split train --domains filesystem
+
+# explain WHY trajectories passed/failed (rubric + failure locus)
+ouro verify --revision <hf-branch> --domains filesystem --only failed
+
+# reproduce a data-generation repo (e.g. Toucan): assess → elicit → run
+ouro reproduce ~/rsi/Toucan
+```
+
+## The non-negotiables (RSI failure modes)
+1. Reward reliability > everything — the objective checker is the authority;
+   the LLM judge only explains it (a transcript-only judge WILL rubber-stamp a
+   confident agent — observed, and designed against).
+2. Prompt patches are layered at runtime and human-approved; the benchmark's own
+   prompts are never edited. Eval never sees patches.
+3. Rollout & eval share one primitive (no train/eval skew); splits frozen on day one.
+4. Everything reproducible; reward detail + provenance always logged.
+5. Quality-scored datasets (e.g. Toucan-1.5M) are SFT/diversity material, **not**
+   RL reward.
+
+## Status
+Verified end-to-end on the H200 box: filesystem + postgres rollout/eval on mcpmark;
+improve loop incl. approval gate; verify on real failed trajectories (semantic vs
+omission separation); Toucan onboarded as data-pipeline, its dataset adapted, and
+its step1.1 generation reproduced. Training loop: not started (by design).
+
+## Roadmap
+foundation (this) → rejection-sampling SFT self-bootstrap (STaR/ReST) → RL (GRPO/DPO) → task+solver co-evolution (auto-curriculum)

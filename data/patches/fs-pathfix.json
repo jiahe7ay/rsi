@@ -1,0 +1,17 @@
+{
+  "name": "fs-pathfix",
+  "created_at": "2026-07-02T07:36:28",
+  "source": {
+    "repo": "taiyi-lab/mcpmark-eval",
+    "revision": "eval-mcpmark-260626",
+    "traj_model": "qwen36-27b-v3"
+  },
+  "based_on": {
+    "summary": "主要共性问题为：agent 未在所有文件操作中安全构建绝对路径，导致权限错误，以及未能完全遵守任务细粒度规则导致输出格式/内容校验失败。",
+    "failure_modes": [
+      "Path permission error due to missing allowed directory prefix",
+      "Insufficient handling of task-specific format and special rules"
+    ]
+  },
+  "patch_text": "Always begin each task by calling list_allowed_directories to obtain the allowed base directory. Prefix this absolute base path to any relative file path found in the task description before using it in file operations; all file paths passed to tools must be absolute and reside under the allowed directory. Thoroughly extract all formatting, content, and special rules from the task description (e.g., filtering criteria, counting rules, naming conventions, output structure). Before finalizing output, verify that every rule is satisfied. If any rule is unclear, explicitly list each rule and confirm how it was addressed."
+}

@@ -1,0 +1,21 @@
+{
+  "domain": "filesystem",
+  "suite": "easy",
+  "seed": 0,
+  "eval_frac": 0.2,
+  "n_tasks": 10,
+  "train": [
+    "file_context/file_splitting",
+    "file_context/pattern_matching",
+    "file_property/largest_rename",
+    "file_property/txt_merging",
+    "folder_structure/structure_analysis",
+    "legal_document/file_reorganize",
+    "student_database/duplicate_name",
+    "student_database/recommender_name"
+  ],
+  "eval": [
+    "file_context/uppercase",
+    "papers/papers_counting"
+  ]
+}

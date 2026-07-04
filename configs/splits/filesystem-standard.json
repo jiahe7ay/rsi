@@ -1,0 +1,41 @@
+{
+  "domain": "filesystem",
+  "suite": "standard",
+  "seed": 0,
+  "eval_frac": 0.2,
+  "n_tasks": 30,
+  "train": [
+    "desktop/music_report",
+    "desktop/project_management",
+    "desktop_template/budget_computation",
+    "desktop_template/file_arrangement",
+    "file_context/duplicates_searching",
+    "file_context/file_merging",
+    "file_context/pattern_matching",
+    "file_context/uppercase",
+    "file_property/size_classification",
+    "file_property/time_classification",
+    "folder_structure/structure_analysis",
+    "folder_structure/structure_mirror",
+    "legal_document/dispute_review",
+    "legal_document/individual_comments",
+    "legal_document/solution_tracing",
+    "papers/find_math_paper",
+    "papers/organize_legacy_papers",
+    "student_database/duplicate_name",
+    "student_database/gradebased_score",
+    "threestudio/code_locating",
+    "threestudio/output_analysis",
+    "threestudio/requirements_completion",
+    "votenet/dataset_comparison",
+    "votenet/requirements_writing"
+  ],
+  "eval": [
+    "desktop/timeline_extraction",
+    "desktop_template/contact_information",
+    "file_context/file_splitting",
+    "papers/author_folders",
+    "student_database/english_talent",
+    "votenet/debugging"
+  ]
+}

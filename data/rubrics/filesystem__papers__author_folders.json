@@ -1,0 +1,39 @@
+{
+  "task_name": "papers__author_folders",
+  "domain": "filesystem",
+  "criteria": [
+    {
+      "id": "c1",
+      "criterion": "原始HTML文件未被移动、删除或修改，目录中文件数量与初始一致",
+      "weight": 1.0,
+      "critical": true
+    },
+    {
+      "id": "c2",
+      "criterion": "在给定任务文件夹下创建了 frequent_authors 目录",
+      "weight": 1.0,
+      "critical": true
+    },
+    {
+      "id": "c3",
+      "criterion": "frequent_authors 目录下的每个子目录命名完全为小写字母和下划线，格式为 firstname_lastname，且仅使用名（忽略中间名）",
+      "weight": 0.8,
+      "critical": false
+    },
+    {
+      "id": "c4",
+      "criterion": "frequent_authors 子目录对应的作者在全部论文中出现次数 ≥4，且所有出现 ≥4 次的作者均有对应子目录，每个子目录内包含该作者的所有论文副本",
+      "weight": 1.0,
+      "critical": true
+    },
+    {
+      "id": "c5",
+      "criterion": "在给定任务文件夹下创建了 2025_authors 目录",
+      "weight": 1.0,
+      "critical": true
+    }
+  ],
+  "notes": "",
+  "generated_by": "deepseek-v4-pro",
+  "task_excerpt": "Please use FileSystem tools to finish the following task:\n\n### Task Description\n\nYou are given a directory containing multiple paper files. You have a collection of academic papers in HTML format from arXiv. Your task is to analyze these papers, identify authors who have published multiple papers, and organize them into author-specific folders based on specified criteria.\n\n### Task Objectives\n\n#### Part 1: Frequent Authors (≥4 papers)\n1. **Extract author information** from all HTML papers in the given directory\n2. **Identify authors** who appear in 4 or more papers\n3. **Create a directory** `f"
+}

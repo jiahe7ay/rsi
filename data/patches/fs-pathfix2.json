@@ -1,0 +1,17 @@
+{
+  "name": "fs-pathfix2",
+  "created_at": "2026-07-02T07:45:15",
+  "source": {
+    "repo": "taiyi-lab/mcpmark-eval",
+    "revision": "eval-mcpmark-260626",
+    "traj_model": "qwen36-27b-v3"
+  },
+  "based_on": {
+    "summary": "多个文件系统任务中，模型未遵循路径约束，直接使用任务提供的相对路径导致权限错误，需在系统提示词中强调先获取根目录并拼接路径。",
+    "failure_modes": [
+      "未正确使用允许目录，直接使用任务描述的相对路径导致权限错误"
+    ]
+  },
+  "patch_text": "在执行任何文件读写操作前，必须先调用 `list_allowed_directories` 获取当前会话的根目录。  \n随后，所有文件路径都必须基于该根目录进行拼接，如 `根目录 + '/文件名'`；严禁直接使用任务描述中可能出现的相对路径。  \n最终要创建或写入的任何文件，都应直接放置在该根目录下。",
+  "approved": true
+}

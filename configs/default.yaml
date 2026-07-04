@@ -1,0 +1,32 @@
+# Ouroboros default config. Copy and override per run.
+
+paths:
+  hermes_agent: ../hermes-agent     # custom rollout engine (later)
+  mcpmark: ~/mcpmark                # the validated benchmark checkout (agent+env+verifier)
+  data_dir: ./data                  # trajectory pools + eval reports
+  splits_dir: ./configs/splits      # frozen split manifests live here
+
+model:
+  # rollout/eval target = an OpenAI-compatible endpoint (sglang serve of a checkpoint)
+  base_url: http://127.0.0.1:30000/v1
+  model: qwen36-27b
+  checkpoint: null                  # ckpt path — recorded for provenance
+
+tasks:
+  domains: [postgres, filesystem]   # v1: two domains with an existing baseline
+  eval_frac: 0.2                    # held-out fraction, frozen ONCE
+
+rollout:                            # datagen: many samples per task
+  n_samples: 8                      # pipeline --k
+  # shell prefix that activates the env where mcpmark's deps live
+  launcher: "source ~/miniconda3/etc/profile.d/conda.sh && conda activate mcpmark"
+  # NOTE (v1): temperature/max_turns are controlled inside mcpmark's model
+  # config, not from here — exposing them is a later step.
+
+eval:                               # judging: stable, low variance
+  temperature: 0.2
+  k: [1, 4]                         # pass@k
+  num_workers: 4
+
+verify:
+  rebuild_env_each_rollout: true    # NON-NEGOTIABLE: isolate reward per rollout

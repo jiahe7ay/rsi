@@ -1,0 +1,32 @@
+{
+  "domain": "postgres",
+  "suite": "standard",
+  "seed": 0,
+  "eval_frac": 0.2,
+  "n_tasks": 21,
+  "train": [
+    "chinook/employee_hierarchy_management",
+    "chinook/sales_and_music_charts",
+    "dvdrental/customer_analytics_optimization",
+    "dvdrental/film_inventory_management",
+    "employees/employee_performance_analysis",
+    "employees/employee_retention_analysis",
+    "employees/executive_dashboard_automation",
+    "employees/management_structure_analysis",
+    "lego/consistency_enforcement",
+    "lego/database_security_policies",
+    "lego/transactional_inventory_transfer",
+    "security/rls_business_access",
+    "security/user_permission_audit",
+    "sports/baseball_player_analysis",
+    "sports/participant_report_optimization",
+    "sports/team_roster_management",
+    "vectors/dba_vector_analysis"
+  ],
+  "eval": [
+    "chinook/customer_data_migration",
+    "dvdrental/customer_analysis_fix",
+    "employees/employee_demographics_report",
+    "employees/employee_project_tracking"
+  ]
+}

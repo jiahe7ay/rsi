@@ -1,0 +1,45 @@
+{
+  "task_name": "papers__organize_legacy_papers",
+  "domain": "filesystem",
+  "criteria": [
+    {
+      "id": "c1",
+      "criterion": "Directory `papers/organized/` exists and contains only subdirectories named with four-digit years (e.g., `2017`, `2021`) that correspond to actual papers from 2023 or earlier.",
+      "weight": 0.1,
+      "critical": false
+    },
+    {
+      "id": "c2",
+      "criterion": "Every HTML file with an arXiv ID starting with `24` or `25` remains in `papers/`, and every HTML file from 2023 or earlier (ID starts with two digits ≤ 23) has been moved to `papers/organized/{year}/` with its original filename, and the file `arxiv_2025.bib` still resides in `papers/`.",
+      "weight": 0.2,
+      "critical": true
+    },
+    {
+      "id": "c3",
+      "criterion": "For each year directory that contains HTML files, an `INDEX.md` file exists and includes a markdown table with exactly the columns `ArXiv ID | Authors | Local Path` in that order, and no additional columns.",
+      "weight": 0.1,
+      "critical": false
+    },
+    {
+      "id": "c4",
+      "criterion": "Each `INDEX.md` table lists all HTML files present in that year directory, sorted by arXiv ID in ascending order, with the `Local Path` column containing only the filename (e.g., `1707.06347.html`).",
+      "weight": 0.15,
+      "critical": true
+    },
+    {
+      "id": "c5",
+      "criterion": "In every `INDEX.md`, the `Authors` column contains only the first 3 authors extracted from `<meta name=\"citation_author\" content=\"...\"/>` tags, separated by `, `, and if the file has more than 3 such tags the author string ends with `, et al.` (note the dot).",
+      "weight": 0.15,
+      "critical": true
+    },
+    {
+      "id": "c6",
+      "criterion": "File `papers/organized/SUMMARY.md` exists and contains a markdown table with columns `Year | Paper Count | Index Link`, where each `Index Link` is a relative link in the form `[View Index]({year}/INDEX.md)`, rows are sorted by year ascending, and `Paper Count` equals the number of HTML files in the corresponding year directory.",
+      "weight": 0.15,
+      "critical": true
+    }
+  ],
+  "notes": "",
+  "generated_by": "deepseek-v4-pro",
+  "task_excerpt": "Please use FileSystem tools to finish the following task:\n\n### Task Description\n\nYou are given a directory containing multiple paper files. You have a collection of arXiv papers saved as HTML files in the papers directory, along with a BibTeX file. Your task is to organize the older papers (2023 and earlier) into a structured year-based hierarchy with proper documentation, while leaving newer papers in the original location.\n\n### Task Objectives\n\n1. **Organize by year**: Create a year-based directory structure for papers from 2023 and earlier\n2. **Generate documentation**: Create INDEX.md file"
+}

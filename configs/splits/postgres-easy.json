@@ -1,0 +1,21 @@
+{
+  "domain": "postgres",
+  "suite": "easy",
+  "seed": 0,
+  "eval_frac": 0.2,
+  "n_tasks": 10,
+  "train": [
+    "chinook/customer_data_migration_basic",
+    "chinook/update_employee_info",
+    "dvdrental/create_payment_index",
+    "employees/department_summary_view",
+    "employees/employee_gender_statistics",
+    "employees/employee_projects_basic",
+    "employees/hiring_year_summary",
+    "sports/create_performance_indexes"
+  ],
+  "eval": [
+    "lego/basic_security_setup",
+    "lego/fix_data_inconsistencies"
+  ]
+}

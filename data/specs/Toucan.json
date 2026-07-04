@@ -1,0 +1,51 @@
+{
+  "name": "Toucan",
+  "repo_path": "/home/ubuntu/rsi/Toucan",
+  "adapter": "llm-explored",
+  "kind": "data-pipeline",
+  "entrypoint": "datagen/step1.1_gen_questions.py",
+  "env_file": "datagen/model_configs.json",
+  "required_env": [
+    {
+      "key": "SMITHERY_API_KEY",
+      "purpose": "Access MCP servers via Smithery API for tool execution",
+      "example": "",
+      "secret": true,
+      "required": true
+    },
+    {
+      "key": "OPENAI_API_KEY",
+      "purpose": "LLM API for question generation and quality checks",
+      "example": "",
+      "secret": true,
+      "required": true
+    },
+    {
+      "key": "TOGETHER_API_KEY",
+      "purpose": "Alternative LLM API provider",
+      "example": "",
+      "secret": true,
+      "required": true
+    },
+    {
+      "key": "OPENROUTER_API_KEY",
+      "purpose": "Alternative LLM API provider",
+      "example": "",
+      "secret": true,
+      "required": true
+    }
+  ],
+  "deps": [],
+  "notes": [
+    "Requires multiple Smithery API keys in datagen/smithery_api_pool.json",
+    "Multi-step pipeline: step1.* question synthesis, step2.* quality check, step3.* trajectory generation, step4.* response quality check",
+    "Datagen scripts use config from datagen/model_configs.json",
+    "run_hint: python datagen/step1.1_gen_questions.py --total_prompts 1000 --sampling_strategy random"
+  ],
+  "domains": [],
+  "data_source": {
+    "hf_repo": "Agent-Ark/Toucan-1.5M",
+    "local_glob": "datagen/*.jsonl",
+    "format": "jsonl"
+  }
+}
