@@ -79,6 +79,30 @@ def cmd_improve(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_agent(args: argparse.Namespace) -> int:
+    """Interactive top-level agent: the user states a goal; the agent composes
+    the existing ouro commands (and shell) itself, asking the user when it needs
+    clarification or credentials."""
+    import os
+    from ouroboros.agent import run_agent
+    bu, key = os.environ.get("OPENAI_BASE_URL"), os.environ.get("OPENAI_API_KEY")
+    if not bu or not key:
+        print("缺 OPENAI_BASE_URL/OPENAI_API_KEY(先 source 一个 .mcp_env)。")
+        return 1
+    goal = args.goal
+    if not goal:
+        try:
+            goal = input("你想做什么(自然语言描述需求)> ").strip()
+        except EOFError:
+            goal = ""
+    if not goal:
+        print("(空需求,退出)")
+        return 1
+    print(f"▶ agent 接需求(model={args.model}, max_turns={args.max_turns}): {goal[:120]}")
+    r = run_agent(goal, args.model, bu, key, cwd=args.cwd, max_turns=args.max_turns)
+    return 0 if r.get("done") else 1
+
+
 def cmd_reproduce(args: argparse.Namespace) -> int:
     """Reproduce a data pipeline's generation: agent judges what's missing →
     interactive prompts collect it from the user → run the minimal generation."""
@@ -214,6 +238,13 @@ def build_parser() -> argparse.ArgumentParser:
     vf.add_argument("--limit", type=int, default=20, help="轨迹上限")
     vf.add_argument("--regen", action="store_true", help="忽略缓存,重新生成 rubric")
     vf.set_defaults(func=cmd_verify)
+
+    ag = sub.add_parser("agent", help="交互 agent:输入框收你的需求,agent 自己组合 ouro 命令实现,缺什么问你")
+    ag.add_argument("--goal", default=None, help="需求(不传则进入输入框)")
+    ag.add_argument("--model", default="deepseek-v4-pro", help="agent 用的 LLM(直连 dimcode)")
+    ag.add_argument("--max-turns", dest="max_turns", type=int, default=30)
+    ag.add_argument("--cwd", default=None, help="agent 工作目录(默认当前目录)")
+    ag.set_defaults(func=cmd_agent)
 
     rp = sub.add_parser("reproduce", help="复现数据管线:agent 判缺什么 → 终端交互补齐 → 实跑最小生成")
     rp.add_argument("repo", help="数据管线 repo 路径(如 ~/rsi/Toucan)")
